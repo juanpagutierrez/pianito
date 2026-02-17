@@ -24,7 +24,7 @@ paintScoreBar();
 
 controlBtn.addEventListener('click', function () {
     if (startBtn.innerHTML === "START" || startBtn.innerHTML === "GG") {
-        // start game
+        
         lastTimestamp = performance.now();
         rafId = window.requestAnimationFrame(gameLoop);
         geneTmp = window.setInterval(geneBlock, 600);
@@ -41,7 +41,7 @@ controlBtn.addEventListener('click', function () {
     }
 });
 
-// global keyboard handlers (single attachment)
+
 window.addEventListener('keydown', function (e) { keyState[e.keyCode] = true; });
 window.addEventListener('keyup', function (e) { keyState[e.keyCode] = false; });
 function paintScoreBar(){
@@ -61,7 +61,7 @@ function geneBlock(){
             flag = false;
         }
     }
-    if(flag)return;//if mytiles array didn't have false element, then return
+    if(flag)return;
 
     while(eachState[myRand])
         myRand = Math.floor(Math.random()*numOfTiles);
@@ -148,7 +148,7 @@ function gameLoop(timestamp){
     const delta = timestamp - lastTimestamp;
     lastTimestamp = timestamp;
 
-    // update score display
+    
     const textWidth = context_score.measureText(myScore.toString()).width;
     context_score.clearRect(0,0,a.width,70);
     context_score.font = "30px Verdana";
@@ -157,9 +157,9 @@ function gameLoop(timestamp){
     context_score.fillStyle = "rgba(88,38,255,0.8)";
     context_score.fillText(myScore.toString(), (a.width / 2) - (textWidth / 2) + 9, 50);
 
-    // clear main canvas and redraw alive tiles
+    
     context.clearRect(0,0,c.width,c.height);
-    const speed = 0.2; // pixels per ms (about 200 px/s)
+    const speed = 0.2;
 
     for(let i = 0; i < numOfTiles; ++i){
         if(eachState[i] && myTiles[i] && myTiles[i].live){
@@ -167,7 +167,7 @@ function gameLoop(timestamp){
             context.fillStyle = "black";
             context.fillRect(myTiles[i].x, Math.round(myTiles[i].y), myTiles[i].width, myTiles[i].height);
 
-            // hit check in zone
+            
             if(myTiles[i].y < 470 && myTiles[i].y > 350){
                 if((keyState[65] && myTiles[i].x === 0) ||
                    (keyState[83] && myTiles[i].x === 75) ||
@@ -178,7 +178,7 @@ function gameLoop(timestamp){
             }
 
             if(myTiles[i].y > 470){
-                // miss -> show red and end game
+                
                 context.fillStyle = "rgba(245,13,13,0.8)";
                 context.fillRect(myTiles[i].x, Math.round(myTiles[i].y), myTiles[i].width, myTiles[i].height);
                 myTiles[i].live = false;
@@ -189,7 +189,7 @@ function gameLoop(timestamp){
                 rafId = null;
                 geneTmp = null;
                 startBtn.innerHTML = "GG";
-                return; // stop loop
+                return; 
             }
         }
     }
