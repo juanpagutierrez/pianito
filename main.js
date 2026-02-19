@@ -1,3 +1,8 @@
+/* =====================================================
+   CAPA DE PRESENTACIÓN
+   Referencias al DOM y canvas (elementos visuales)
+===================================================== */
+
 const c = document.getElementById("piano");
 const context = c.getContext("2d");
 const b = document.getElementById("background");
@@ -9,6 +14,12 @@ const startBtn = document.getElementById('start_btn');
 const controlBtn = document.getElementById('btn');
 const musicEl = document.getElementById('music');
 
+
+/* =====================================================
+   CAPA DE DATOS
+   Aquí se almacena el estado del juego
+===================================================== */
+
 const numOfTiles = 5;
 let myScore = 0;
 const eachState = [false,false,false,false,false];
@@ -19,8 +30,18 @@ let rafId = null;
 let lastTimestamp = 0;
 const keyState = {};
 
+
+/* =====================================================
+   INICIALIZACIÓN (Presentación inicial)
+===================================================== */
+
 paintWindow();
 paintScoreBar();
+
+
+/* =====================================================
+   EVENTOS (Conectan Presentación + Lógica + Datos)
+===================================================== */
 
 controlBtn.addEventListener('click', function () {
     if (startBtn.innerHTML === "START" || startBtn.innerHTML === "GG") {
@@ -41,9 +62,15 @@ controlBtn.addEventListener('click', function () {
     }
 });
 
-
 window.addEventListener('keydown', function (e) { keyState[e.keyCode] = true; });
 window.addEventListener('keyup', function (e) { keyState[e.keyCode] = false; });
+
+
+/* =====================================================
+   CAPA DE PRESENTACIÓN
+   Funciones que dibujan en pantalla
+===================================================== */
+
 function paintScoreBar(){
     score_gradient = context_score.createLinearGradient(0,0,0,80);
     score_gradient.addColorStop(0,"rgba(74,171,254,0)");
@@ -52,22 +79,7 @@ function paintScoreBar(){
     context_score.fillStyle = score_gradient;
     context_score.fillRect(0,0,300,70);    
 }
-function geneBlock(){
-    var myRand = Math.floor(Math.random()*numOfTiles);
-    var i;
-    var flag = true;
-    for( i = 0; i < numOfTiles; ++i){
-        if(!eachState[i]){
-            flag = false;
-        }
-    }
-    if(flag)return;
 
-    while(eachState[myRand])
-        myRand = Math.floor(Math.random()*numOfTiles);
-    myTiles[myRand] = new Block(myRand);
-     
-}
 function paintWindow(){
     my_gradient = context_back.createLinearGradient(0,0,0,600);
     my_gradient.addColorStop(0,"rgba(65,234,246,0.6)");
@@ -100,6 +112,38 @@ function paintWindow(){
     context_back.strokeStyle = "white";
     context_back.stroke();
 }
+
+function move(index){
+    if(myTiles[index].live){
+        myTiles[index].y += 1;
+        context.fillStyle = "black";
+        context.fillRect(myTiles[index].x,myTiles[index].y,70,120);   
+        context.clearRect(myTiles[index].x,myTiles[index].y-1,70,1);
+    }
+}
+
+
+/* =====================================================
+   CAPA DE LÓGICA
+   Reglas del juego
+===================================================== */
+
+function geneBlock(){
+    var myRand = Math.floor(Math.random()*numOfTiles);
+    var i;
+    var flag = true;
+    for( i = 0; i < numOfTiles; ++i){
+        if(!eachState[i]){
+            flag = false;
+        }
+    }
+    if(flag)return;
+
+    while(eachState[myRand])
+        myRand = Math.floor(Math.random()*numOfTiles);
+    myTiles[myRand] = new Block(myRand);
+}
+
 function Block(index){
     if(!eachState[index])
         eachState[index] = true;
@@ -131,24 +175,17 @@ function Block(index){
     this.live = true;
     this.keyCode = false;
 }
-function move(index){
-    if(myTiles[index].live){
-        myTiles[index].y += 1;
-        context.fillStyle = "black";
-        context.fillRect(myTiles[index].x,myTiles[index].y,70,120);   
-        context.clearRect(myTiles[index].x,myTiles[index].y-1,70,1);
-    }
-}
+
 function afterRight(index){
     myScore++;
     myTiles[index].live = false;
     eachState[index] = false;
 }
+
 function gameLoop(timestamp){
     const delta = timestamp - lastTimestamp;
     lastTimestamp = timestamp;
 
-    
     const textWidth = context_score.measureText(myScore.toString()).width;
     context_score.clearRect(0,0,a.width,70);
     context_score.font = "30px Verdana";
@@ -157,7 +194,6 @@ function gameLoop(timestamp){
     context_score.fillStyle = "rgba(88,38,255,0.8)";
     context_score.fillText(myScore.toString(), (a.width / 2) - (textWidth / 2) + 9, 50);
 
-    
     context.clearRect(0,0,c.width,c.height);
     const speed = 0.2;
 
@@ -167,7 +203,6 @@ function gameLoop(timestamp){
             context.fillStyle = "black";
             context.fillRect(myTiles[i].x, Math.round(myTiles[i].y), myTiles[i].width, myTiles[i].height);
 
-            
             if(myTiles[i].y < 470 && myTiles[i].y > 350){
                 if((keyState[65] && myTiles[i].x === 0) ||
                    (keyState[83] && myTiles[i].x === 75) ||
@@ -178,7 +213,6 @@ function gameLoop(timestamp){
             }
 
             if(myTiles[i].y > 470){
-                
                 context.fillStyle = "rgba(245,13,13,0.8)";
                 context.fillRect(myTiles[i].x, Math.round(myTiles[i].y), myTiles[i].width, myTiles[i].height);
                 myTiles[i].live = false;
@@ -196,4 +230,3 @@ function gameLoop(timestamp){
 
     rafId = window.requestAnimationFrame(gameLoop);
 }
- 
